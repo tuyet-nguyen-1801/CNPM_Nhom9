@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhoneStore – Quản lý cửa hàng điện thoại</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- SVG DEFS (shared gradient for logo) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1e40af"/><stop offset="1" stop-color="#0891b2"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3>⚠️ Xác nhận</h3></div>
+    <div class="modal-body">
+      <p id="confirm-msg" style="font-size:15px;text-align:center;padding:10px 0"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="confirm-no">Hủy</button>
+      <button class="btn btn-danger" id="confirm-yes">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="login-page" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg class="logo-svg-lg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="64" height="64" rx="16" fill="url(#logo-grad)"/>
+        <rect x="20" y="8" width="24" height="42" rx="5" fill="white" opacity=".95"/>
+        <rect x="23" y="13" width="18" height="27" rx="2.5" fill="#1d4ed8"/>
+        <circle cx="32" cy="45" r="2.5" fill="white"/>
+        <rect x="28" y="10" width="8" height="2" rx="1" fill="rgba(0,0,0,.15)"/>
+      </svg>
+      <h1>PhoneStore</h1>
+      <p>Hệ thống quản lý cửa hàng điện thoại</p>
+    </div>
+
+    <!-- Register success banner -->
+    <div class="register-success-banner" id="register-success-banner">
+      ✅ Đăng ký thành công! Hãy dùng tab "Khách hàng" để đăng nhập.
+    </div>
+
+    <!-- Login Tabs -->
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-staff" onclick="switchLoginTab('staff')">👤 Nhân viên</button>
+      <button class="login-tab" id="tab-customer" onclick="switchLoginTab('customer')">🛒 Khách hàng</button>
+    </div>
+
+    <!-- STAFF LOGIN -->
+    <div id="staff-login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="email@phonestore.vn">
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="login-password" placeholder="••••••••">
+      </div>
+      <div id="login-error" class="login-error"></div>
+      <button class="btn-login" id="btn-login">Đăng nhập →</button>
+      <p style="text-align:center;color:var(--gray-400);font-size:12px;margin-top:16px">
+        Admin: admin@phonestore.vn / Admin@123<br>
+        NV: lan.tran@phonestore.vn hoặc hung.le@phonestore.vn / Nhanvien@1
+      </p>
+    </div>
+
+    <!-- CUSTOMER LOGIN -->
+    <div id="customer-login-form" style="display:none">
+      <div class="form-group">
+        <label>Số điện thoại</label>
+        <input type="tel" id="clogin-phone" placeholder="0901234567">
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <div class="password-wrapper">
+          <input type="password" id="clogin-password" placeholder="••••••••">
+          <button type="button" class="password-toggle" onclick="togglePwd('clogin-password',this)">👁</button>
+        </div>
+      </div>
+      <div id="clogin-error" class="login-error"></div>
+      <button class="btn-login" id="btn-clogin" onclick="doCustomerLogin()">Đăng nhập →</button>
+    </div>
+
+    <div class="register-section">
+      <p>Khách hàng mới? <a onclick="openRegister()">Đăng ký ngay →</a></p>
+      <p style="margin-top:8px"><a class="change-pwd-link" onclick="openChangePassword()">🔑 Đổi mật khẩu</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CUSTOMER PORTAL ==================== -->
+<div id="customer-portal" style="display:none">
+  <div class="portal-topbar">
+    <div class="portal-brand">
+      <svg style="width:28px;height:28px" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="9" fill="rgba(255,255,255,.2)"/>
+        <rect x="11" y="5" width="14" height="24" rx="3" fill="white" opacity=".9"/>
+        <rect x="13" y="8" width="10" height="15" rx="2" fill="#1d4ed8"/>
+        <circle cx="18" cy="26" r="1.5" fill="white"/>
+      </svg>
+      PhoneStore
+    </div>
+    <div class="portal-welcome">Xin chào, <strong id="portal-username"></strong> 👋</div>
+    <button class="cart-topbar-btn" onclick="openCart()" title="Giỏ hàng" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:#fff;margin-right:8px">
+      🛒 <span class="cart-btn-label">Giỏ</span>
+      <span class="cart-badge" id="cart-badge-portal"></span>
+    </button>
+    <button class="btn-portal-logout" onclick="customerLogout()">🚪 Đăng xuất</button>
+  </div>
+  <div class="portal-body">
+    <div class="portal-tabs">
+      <button class="portal-tab active" id="ptab-products" onclick="switchPortalTab('products',this)">🛍️ Mua sắm</button>
+      <button class="portal-tab" id="ptab-orders" onclick="switchPortalTab('orders',this)">📦 Đơn hàng</button>
+      <button class="portal-tab" id="ptab-profile" onclick="switchPortalTab('profile',this)">👤 Tài khoản</button>
+    </div>
+
+    <!-- Products tab -->
+    <div class="portal-section active" id="portal-products">
+      <div class="card" style="margin-bottom:16px;padding:16px 20px">
+        <div class="portal-search-bar">
+          <div class="search-box" style="flex:1">
+            <span class="icon">🔍</span>
+            <input type="text" id="pp-search" placeholder="Tìm sản phẩm..." oninput="filterPortalProducts()">
+          </div>
+          <select class="filter-select" id="pp-brand" onchange="filterPortalProducts()">
+            <option value="">Tất cả hãng</option>
+            <option>Apple</option><option>Samsung</option><option>Xiaomi</option>
+            <option>OPPO</option><option>Vivo</option><option>Realme</option>
+          </select>
+          <select class="filter-select" id="pp-cat" onchange="filterPortalProducts()">
+            <option value="">Tất cả phân khúc</option>
+            <option value="flagship">🏆 Flagship</option>
+            <option value="mid-range">📱 Tầm trung</option>
+            <option value="budget">💰 Giá rẻ</option>
+          </select>
+        </div>
+      </div>
+      <div id="portal-product-grid" class="product-grid"></div>
+      <div id="portal-product-loading" style="text-align:center;padding:40px;color:var(--gray-400)">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Orders tab -->
+    <div class="portal-section" id="portal-orders">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📦 Lịch sử đơn hàng</span>
+          <button class="btn btn-outline btn-sm" onclick="loadPortalOrders()">🔄 Làm mới</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Mã đơn</th><th>Số SP</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Ngày đặt</th></tr></thead>
+            <tbody id="portal-orders-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile tab -->
+    <div class="portal-section" id="portal-profile">
+      <div class="card">
+        <div class="card-header"><span class="card-title">👤 Thông tin cá nhân</span></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="form-group"><label>Họ tên</label><input class="form-control" id="pp-name" readonly></div>
+            <div class="form-group"><label>Số điện thoại</label><input class="form-control" id="pp-phone" readonly></div>
+            <div class="form-group"><label>Email</label><input class="form-control" id="pp-email" readonly></div>
+            <div class="form-group"><label>Giới tính</label><input class="form-control" id="pp-gender" readonly></div>
+            <div class="form-group" style="grid-column:1/-1"><label>Địa chỉ</label><input class="form-control" id="pp-address" readonly></div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)">
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:10px">Muốn đổi mật khẩu? <a style="color:var(--primary);cursor:pointer;font-weight:600" onclick="customerLogout();setTimeout(openChangePassword,300)">Nhấn vào đây →</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app" style="display:none">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <svg class="logo-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="9" fill="url(#logo-grad)"/>
+          <rect x="11" y="5" width="14" height="24" rx="3" fill="white" opacity=".95"/>
+          <rect x="13" y="8" width="10" height="15" rx="2" fill="#1d4ed8"/>
+          <circle cx="18" cy="26" r="1.5" fill="white"/>
+          <rect x="15.5" y="6.5" width="5" height="1.5" rx=".75" fill="rgba(0,0,0,.15)"/>
+        </svg>
+        <div><h2>PhoneStore</h2><span>Quản lý cửa hàng</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Tổng quan</div>
+        <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </div>
+
+        <div class="nav-section-title">Quản lý</div>
+        <div class="nav-item" data-page="phones" onclick="navigateTo('phones')">
+          <span class="nav-icon">📱</span> Sản phẩm
+        </div>
+        <div class="nav-item" data-page="customers" onclick="navigateTo('customers')">
+          <span class="nav-icon">👥</span> Khách hàng
+        </div>
+        <div class="nav-item" data-page="orders" onclick="navigateTo('orders')">
+          <span class="nav-icon">🛒</span> Đơn hàng
+        </div>
+        <div class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
+          <span class="nav-icon">🧾</span> Hóa đơn
+        </div>
+        <div class="nav-item" data-page="inventory" onclick="navigateTo('inventory')">
+          <span class="nav-icon">📦</span> Kho hàng
+        </div>
+
+        <div class="nav-section-title">Báo cáo & Admin</div>
+        <div class="nav-item" data-page="stats" onclick="navigateTo('stats')">
+          <span class="nav-icon">📈</span> Báo cáo
+        </div>
+        <div class="nav-item admin-only" data-page="users" onclick="navigateTo('users')">
+          <span class="nav-icon">👤</span> Nhân viên
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="nav-item" onclick="logout()">
+          <span class="nav-icon">🚪</span> Đăng xuất
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-title" id="topbar-title">📊 Tổng quan</div>
+        <!-- Cart Button -->
+        <button class="cart-topbar-btn" onclick="openCart()" title="Giỏ hàng">
+          🛒 <span class="cart-btn-label">Giỏ hàng</span>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </button>
+        <div class="topbar-user">
+          <div class="user-avatar" id="topbar-avatar">A</div>
+          <div class="user-info">
+            <div class="user-name" id="topbar-name">Admin</div>
+            <div class="user-role" id="topbar-role">admin</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGES -->
+      <div class="page-content">
+
+        <!-- ===== DASHBOARD ===== -->
+        <div class="page active" id="page-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue">💰</div>
+              <div class="stat-info"><div class="stat-value" id="stat-revenue">—</div><div class="stat-label">Doanh thu tháng này</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">🛒</div>
+              <div class="stat-info"><div class="stat-value" id="stat-orders">—</div><div class="stat-label">Đơn hàng tháng này</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">👥</div>
+              <div class="stat-info"><div class="stat-value" id="stat-customers">—</div><div class="stat-label">Khách hàng mới</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red">⚠️</div>
+              <div class="stat-info"><div class="stat-value" id="stat-lowstock">—</div><div class="stat-label">SP sắp hết hàng</div></div>
+            </div>
+          </div>
+
+          <!-- Order Stats Row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+            <div style="background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:var(--shadow)">
+              <div style="font-size:24px;font-weight:800;color:var(--warning)" id="stat-pending">—</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Chờ xác nhận</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:var(--shadow)">
+              <div style="font-size:24px;font-weight:800;color:var(--info)" id="stat-delivering">—</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Đang giao</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:var(--shadow)">
+              <div style="font-size:24px;font-weight:800;color:var(--success)" id="stat-completed">—</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Hoàn thành</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:var(--shadow)">
+              <div style="font-size:24px;font-weight:800;color:var(--danger)" id="stat-cancelled">—</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Đã hủy</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><span class="card-title">📈 Doanh thu 6 tháng gần nhất</span></div>
+              <div class="card-body"><div id="revenue-chart" style="min-height:200px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">🏆 Top sản phẩm bán chạy</span></div>
+              <div class="table-container">
+                <table><thead><tr><th>#</th><th>Sản phẩm</th><th>Đã bán</th><th>Doanh thu</th></tr></thead>
+                <tbody id="top-phones-body"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">🕐 Đơn hàng gần nhất</span></div>
+            <div class="table-container">
+              <table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày đặt</th></tr></thead>
+              <tbody id="recent-orders-body"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== PHONES ===== -->
+        <div class="page" id="page-phones">
+          <div class="card">
+            <div class="toolbar">
+              <div class="search-box" style="flex:1">
+                <span class="icon">🔍</span>
+                <input type="text" id="phone-search" placeholder="Tìm tên, hãng, model...">
+              </div>
+              <select class="filter-select" id="phone-brand-filter">
+                <option value="">Tất cả hãng</option>
+                <option>Apple</option><option>Samsung</option><option>Xiaomi</option>
+                <option>OPPO</option><option>Vivo</option><option>Realme</option>
+              </select>
+              <select class="filter-select" id="phone-cat-filter">
+                <option value="">Tất cả phân khúc</option>
+                <option value="flagship">🏆 Flagship</option>
+                <option value="mid-range">📱 Tầm trung</option>
+                <option value="budget">💰 Giá rẻ</option>
+              </select>
+              <button class="btn btn-primary admin-only" onclick="openAddPhone()">➕ Thêm sản phẩm</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Ảnh</th><th>Tên sản phẩm</th><th>Phân khúc</th><th>Giá bán</th><th>Giá nhập</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody id="phones-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="phones-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ===== CUSTOMERS ===== -->
+        <div class="page" id="page-customers">
+          <div class="card">
+            <div class="toolbar">
+              <div class="search-box" style="flex:1">
+                <span class="icon">🔍</span>
+                <input type="text" id="customer-search" placeholder="Tìm tên, SĐT, email..." oninput="custSearch=this.value;custPage=1;fetchCustomers()">
+              </div>
+              <button class="btn btn-primary" onclick="openAddCustomer()">➕ Thêm khách hàng</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Tên khách hàng</th><th>Điện thoại</th><th>Email</th><th>Giới tính</th><th>Địa chỉ</th><th>Đơn hàng</th><th>Thao tác</th></tr></thead>
+                <tbody id="customers-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="customers-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ===== ORDERS ===== -->
+        <div class="page" id="page-orders">
+          <div class="card">
+            <div class="toolbar">
+              <div class="search-box" style="flex:1">
+                <span class="icon">🔍</span>
+                <input type="text" placeholder="Tìm mã đơn, khách hàng..." oninput="orderSearch=this.value;orderPage=1;fetchOrders()">
+              </div>
+              <select class="filter-select" onchange="orderStatus=this.value;orderPage=1;fetchOrders()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending">Chờ xác nhận</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="delivering">Đang giao</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+              <button class="btn btn-primary" onclick="openCreateOrder()">➕ Tạo đơn hàng</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="orders-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ===== INVOICES ===== -->
+        <div class="page" id="page-invoices">
+          <div class="card">
+            <div class="toolbar">
+              <div class="search-box" style="flex:1">
+                <span class="icon">🔍</span>
+                <input type="text" placeholder="Tìm mã hóa đơn, khách hàng..." oninput="invSearch=this.value;invPage=1;fetchInvoices()">
+              </div>
+              <select class="filter-select" onchange="invStatus=this.value;invPage=1;fetchInvoices()">
+                <option value="">Tất cả</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="unpaid">Chưa thanh toán</option>
+              </select>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Mã hóa đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
+                <tbody id="invoices-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="invoices-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ===== INVENTORY ===== -->
+        <div class="page" id="page-inventory">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📦 Tồn kho hiện tại</span>
+              <button class="btn btn-outline btn-sm" onclick="load_inventory()">🔄 Làm mới</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Sản phẩm</th><th>Phân khúc</th><th>Tồn kho</th><th>Ngưỡng tối thiểu</th><th>Vị trí</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody id="inventory-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="page" id="page-stats">
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header">
+              <span class="card-title">📈 Báo cáo doanh thu</span>
+              <div style="display:flex;gap:10px;align-items:center">
+                <input type="date" id="stats-from" class="form-control" style="width:150px">
+                <span>→</span>
+                <input type="date" id="stats-to" class="form-control" style="width:150px">
+                <button class="btn btn-primary" onclick="fetchStats()">Xem báo cáo</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+            <div class="stat-card"><div class="stat-icon green">💰</div>
+              <div class="stat-info"><div class="stat-value" id="stats-total-rev">—</div><div class="stat-label">Tổng doanh thu</div></div></div>
+            <div class="stat-card"><div class="stat-icon blue">🧾</div>
+              <div class="stat-info"><div class="stat-value" id="stats-total-orders">—</div><div class="stat-label">Tổng hóa đơn</div></div></div>
+            <div class="stat-card"><div class="stat-icon orange">📊</div>
+              <div class="stat-info"><div class="stat-value" id="stats-avg">—</div><div class="stat-label">Trung bình/hóa đơn</div></div></div>
+          </div>
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Ngày</th><th>Số hóa đơn</th><th>Doanh thu</th><th>Trước thuế/GG</th><th>TB/hóa đơn</th></tr></thead>
+                <tbody id="stats-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USERS ===== -->
+        <div class="page" id="page-users">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">👤 Quản lý nhân viên</span>
+              <button class="btn btn-primary" onclick="openAddUser()">➕ Thêm nhân viên</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Tên nhân viên</th><th>Email</th><th>Vai trò</th><th>Điện thoại</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end page-content -->
+    </main>
+  </div><!-- end layout -->
+</div><!-- end app -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Phone Detail Modal -->
+<div class="modal-overlay" id="phone-detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📱 Chi tiết sản phẩm</h3>
+      <button class="modal-close" onclick="closeModal('phone-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="phone-detail-content"></div>
+  </div>
+</div>
+
+<!-- Phone Form Modal -->
+<div class="modal-overlay" id="phone-form-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="phone-form-title">Sản phẩm</h3>
+      <button class="modal-close" onclick="closeModal('phone-form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="phone-edit-id">
+      <form id="phone-form">
+        <div class="form-row">
+          <div class="form-group"><label>Tên sản phẩm <span class="required">*</span></label><input class="form-control" id="pf-name" placeholder="VD: iPhone 15 Pro Max"></div>
+          <div class="form-group"><label>Hãng <span class="required">*</span></label>
+            <select class="form-control" id="pf-brand">
+              <option>Apple</option><option>Samsung</option><option>Xiaomi</option><option>OPPO</option><option>Vivo</option><option>Realme</option><option>Nokia</option><option>Khác</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Model</label><input class="form-control" id="pf-model" placeholder="VD: A3106"></div>
+          <div class="form-group"><label>Phân khúc</label>
+            <select class="form-control" id="pf-category">
+              <option value="flagship">🏆 Flagship</option>
+              <option value="mid-range" selected>📱 Tầm trung</option>
+              <option value="budget">💰 Giá rẻ</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Giá bán (VNĐ) <span class="required">*</span></label><input class="form-control" type="number" id="pf-price" placeholder="34990000"></div>
+          <div class="form-group"><label>Giá nhập (VNĐ) <span class="required">*</span></label><input class="form-control" type="number" id="pf-import_price" placeholder="28000000"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>RAM</label><input class="form-control" id="pf-ram" placeholder="8GB"></div>
+          <div class="form-group"><label>Bộ nhớ trong</label><input class="form-control" id="pf-storage" placeholder="256GB"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Màn hình</label><input class="form-control" id="pf-screen" placeholder="6.7 inch AMOLED"></div>
+          <div class="form-group"><label>Pin</label><input class="form-control" id="pf-battery" placeholder="5000 mAh"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Camera</label><input class="form-control" id="pf-camera" placeholder="48MP + 12MP"></div>
+          <div class="form-group"><label>Hệ điều hành</label><input class="form-control" id="pf-os" placeholder="iOS 17 / Android 14"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Chip</label><input class="form-control" id="pf-chip" placeholder="Apple A17 Pro"></div>
+          <div class="form-group"><label>SIM</label><input class="form-control" id="pf-sim" placeholder="Nano SIM + eSIM"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Màu sắc</label><input class="form-control" id="pf-colors" placeholder="Đen, Trắng, Xanh"></div>
+          <div class="form-group"><label>Bảo hành (tháng)</label><input class="form-control" type="number" id="pf-warranty" value="12"></div>
+        </div>
+        <div class="form-group"><label>URL ảnh sản phẩm</label><input class="form-control" id="pf-image" placeholder="https://..."></div>
+        <div class="form-group"><label>Tồn kho ban đầu</label><input class="form-control" type="number" id="pf-stock" value="0" placeholder="Chỉ nhập khi thêm mới"></div>
+        <div class="form-group"><label>Trạng thái</label>
+          <select class="form-control" id="pf-is_active">
+            <option value="1">✅ Hoạt động</option><option value="0">❌ Ẩn</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Mô tả</label><textarea class="form-control" id="pf-description" rows="3" placeholder="Mô tả sản phẩm..."></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('phone-form-modal')">Hủy</button>
+      <button class="btn btn-primary" onclick="savePhone()">💾 Lưu sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Form Modal -->
+<div class="modal-overlay" id="customer-form-modal">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3 id="customer-form-title">Khách hàng</h3>
+      <button class="modal-close" onclick="closeModal('customer-form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="customer-edit-id">
+      <form id="customer-form">
+        <div class="form-row">
+          <div class="form-group"><label>Họ tên <span class="required">*</span></label><input class="form-control" id="cf-name" placeholder="Nguyễn Văn A"></div>
+          <div class="form-group"><label>Số điện thoại <span class="required">*</span></label><input class="form-control" id="cf-phone" placeholder="0901234567"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input class="form-control" type="email" id="cf-email" placeholder="email@gmail.com"></div>
+          <div class="form-group"><label>Giới tính</label>
+            <select class="form-control" id="cf-gender">
+              <option value="male">Nam</option><option value="female">Nữ</option><option value="other">Khác</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ngày sinh</label><input class="form-control" type="date" id="cf-birthday"></div>
+          <div class="form-group"><label>Địa chỉ</label><input class="form-control" id="cf-address" placeholder="Địa chỉ khách hàng"></div>
+        </div>
+        <div class="form-group"><label>Ghi chú</label><textarea class="form-control" id="cf-note" rows="2"></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('customer-form-modal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Order Modal -->
+<div class="modal-overlay" id="create-order-modal">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <h3>🛒 Tạo đơn hàng mới</h3>
+      <button class="modal-close" onclick="closeModal('create-order-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="order-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div>
+            <h4 style="margin-bottom:16px;color:var(--gray-700)">👤 Thông tin khách hàng</h4>
+            <div class="form-row">
+              <div class="form-group"><label>Tên khách <span class="required">*</span></label><input class="form-control" id="order-cust-name" placeholder="Nguyễn Văn A"></div>
+              <div class="form-group"><label>Số điện thoại <span class="required">*</span></label><input class="form-control" id="order-cust-phone" placeholder="0901234567"></div>
+            </div>
+            <div class="form-group"><label>Email</label><input class="form-control" id="order-cust-email" placeholder="email@gmail.com"></div>
+            <div class="form-group"><label>Địa chỉ giao hàng</label><input class="form-control" id="order-cust-addr" placeholder="Địa chỉ giao hàng"></div>
+            <div class="form-row">
+              <div class="form-group"><label>Thanh toán</label>
+                <select class="form-control" id="order-payment">
+                  <option value="cash">💵 Tiền mặt</option>
+                  <option value="transfer">🏦 Chuyển khoản</option>
+                  <option value="card">💳 Thẻ</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Giảm giá (VNĐ)</label><input class="form-control" type="number" id="order-discount" value="0" oninput="updateOrderTotal()"></div>
+            </div>
+            <div class="form-group"><label>Ghi chú</label><textarea class="form-control" id="order-note" rows="2"></textarea></div>
+          </div>
+          <div>
+            <h4 style="margin-bottom:16px;color:var(--gray-700)">📱 Chọn sản phẩm</h4>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <select class="form-control" id="order-phone-select" style="flex:1"></select>
+              <input class="form-control" type="number" id="order-qty" value="1" min="1" style="width:70px">
+              <button type="button" class="btn btn-success" onclick="addToCart()">+ Thêm</button>
+            </div>
+            <div id="order-cart" style="min-height:100px;margin-bottom:16px"></div>
+            <div class="summary-box">
+              <div class="summary-row"><span>Tạm tính</span><span id="order-subtotal">0 ₫</span></div>
+              <div class="summary-row"><span>Giảm giá</span><span id="order-discount-show">0 ₫</span></div>
+              <div class="summary-row total"><span>Thanh toán</span><span id="order-final" style="color:var(--primary)">0 ₫</span></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('create-order-modal')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitOrder()">✅ Xác nhận đặt hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="order-detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📋 Chi tiết đơn hàng</h3>
+      <button class="modal-close" onclick="closeModal('order-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="order-detail-content"></div>
+  </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal-overlay" id="update-status-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>🔄 Cập nhật trạng thái</h3>
+      <button class="modal-close" onclick="closeModal('update-status-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="us-order-id">
+      <div class="form-group"><label>Trạng thái đơn hàng</label>
+        <select class="form-control" id="us-status">
+          <option value="pending">Chờ xác nhận</option>
+          <option value="confirmed">Đã xác nhận</option>
+          <option value="delivering">Đang giao</option>
+          <option value="completed">Hoàn thành</option>
+          <option value="cancelled">Đã hủy</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Trạng thái thanh toán</label>
+        <select class="form-control" id="us-payment">
+          <option value="unpaid">Chưa thanh toán</option>
+          <option value="paid">Đã thanh toán</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('update-status-modal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveOrderStatus()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Detail Modal -->
+<div class="modal-overlay" id="invoice-detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>🧾 Chi tiết hóa đơn</h3>
+      <button class="modal-close" onclick="closeModal('invoice-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="invoice-detail-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="window.print()">🖨️ In hóa đơn</button>
+      <button class="btn btn-primary" onclick="closeModal('invoice-detail-modal')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Stock Modal -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>📥 Nhập kho</h3>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="import-phone-id">
+      <div class="form-group"><label>Sản phẩm</label><input class="form-control" id="import-phone-name" readonly></div>
+      <div class="form-group"><label>Số lượng nhập <span class="required">*</span></label><input class="form-control" type="number" id="import-qty" min="1" placeholder="Nhập số lượng"></div>
+      <div class="form-group"><label>Ghi chú</label><textarea class="form-control" id="import-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('import-modal')">Hủy</button>
+      <button class="btn btn-success" onclick="saveImport()">📥 Nhập kho</button>
+    </div>
+  </div>
+</div>
+
+<!-- Adjust Stock Modal -->
+<div class="modal-overlay" id="adjust-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>🔧 Điều chỉnh tồn kho</h3>
+      <button class="modal-close" onclick="closeModal('adjust-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="adjust-phone-id">
+      <div class="form-group"><label>Sản phẩm</label><input class="form-control" id="adjust-phone-name" readonly></div>
+      <div class="form-group"><label>Số lượng mới <span class="required">*</span></label><input class="form-control" type="number" id="adjust-qty" min="0"></div>
+      <div class="form-group"><label>Lý do điều chỉnh</label><textarea class="form-control" id="adjust-note" rows="2" placeholder="VD: Kiểm kê tháng 1..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('adjust-modal')">Hủy</button>
+      <button class="btn btn-warning" onclick="saveAdjust()">🔧 Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Form Modal -->
+<div class="modal-overlay" id="user-form-modal">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3 id="user-form-title">Nhân viên</h3>
+      <button class="modal-close" onclick="closeModal('user-form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="user-edit-id">
+      <form id="user-form">
+        <div class="form-row">
+          <div class="form-group"><label>Họ tên <span class="required">*</span></label><input class="form-control" id="uf-name" placeholder="Nguyễn Văn A"></div>
+          <div class="form-group"><label>Email <span class="required">*</span></label><input class="form-control" type="email" id="uf-email" placeholder="email@phonestore.vn"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Mật khẩu</label><input class="form-control" type="password" id="uf-password" placeholder="Để trống = không đổi"></div>
+          <div class="form-group"><label>Vai trò</label>
+            <select class="form-control" id="uf-role">
+              <option value="user">👤 Nhân viên</option>
+              <option value="admin">👑 Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Số điện thoại</label><input class="form-control" id="uf-phone" placeholder="0901234567"></div>
+          <div class="form-group"><label>Trạng thái</label>
+            <select class="form-control" id="uf-is_active">
+              <option value="1">✅ Hoạt động</option>
+              <option value="0">🔒 Bị khóa</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Địa chỉ</label><input class="form-control" id="uf-address" placeholder="Địa chỉ nhân viên"></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('user-form-modal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveUser()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CART OVERLAY & DRAWER ===== -->
+<div class="cart-overlay" id="cart-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-drawer-header">
+    <h3>🛒 Giỏ hàng</h3>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-drawer-body" id="cart-drawer-body">
+    <div class="cart-empty">
+      <div style="font-size:56px;margin-bottom:12px">🛒</div>
+      <p style="font-weight:600;font-size:15px">Giỏ hàng trống</p>
+    </div>
+  </div>
+  <div class="cart-drawer-footer" id="cart-drawer-footer" style="display:none">
+    <div class="cart-footer-total">
+      <span class="lbl">Tổng cộng</span>
+      <span class="amt" id="cart-total-amount">0 ₫</span>
+    </div>
+    <div class="cart-footer-actions">
+      <button class="btn btn-outline" onclick="cartClear()">🗑 Xóa giỏ</button>
+      <button class="btn btn-primary" onclick="openCheckout()">💳 Thanh toán</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>💳 Thanh toán</h3>
+      <button class="modal-close" onclick="closeModal('checkout-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div style="text-align:center">
+          <div class="step active" id="co-step-dot-1">1</div>
+          <div class="step-label">Thông tin</div>
+        </div>
+        <div class="step-line" id="co-step-line"></div>
+        <div style="text-align:center">
+          <div class="step" id="co-step-dot-2">2</div>
+          <div class="step-label">Thanh toán</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Customer info + cart summary -->
+      <div id="co-step-1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div>
+            <h4 style="margin-bottom:14px;color:var(--gray-700);font-size:14px">👤 Thông tin khách hàng</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Họ tên <span class="required">*</span></label>
+                <input class="form-control" id="co-name" placeholder="Nguyễn Văn A">
+              </div>
+              <div class="form-group">
+                <label>Số điện thoại <span class="required">*</span></label>
+                <input class="form-control" id="co-phone" placeholder="0901234567">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input class="form-control" type="email" id="co-email" placeholder="email@gmail.com">
+            </div>
+            <div class="form-group">
+              <label>Địa chỉ giao hàng</label>
+              <input class="form-control" id="co-addr" placeholder="Địa chỉ nhận hàng">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Hình thức thanh toán</label>
+                <select class="form-control" id="co-payment">
+                  <option value="cash">💵 Tiền mặt</option>
+                  <option value="transfer">🏦 Chuyển khoản (QR)</option>
+                  <option value="card">💳 Thẻ ngân hàng</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Giảm giá (₫)</label>
+                <input class="form-control" type="number" id="checkout-discount" value="0" min="0" oninput="updateCheckoutFinal()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <textarea class="form-control" id="co-note" rows="2" placeholder="Ghi chú đơn hàng..."></textarea>
+            </div>
+          </div>
+          <div>
+            <h4 style="margin-bottom:14px;color:var(--gray-700);font-size:14px">🛒 Đơn hàng</h4>
+            <div id="co-summary-items" style="margin-bottom:16px"></div>
+            <div class="summary-box">
+              <div class="summary-row"><span>Tạm tính</span><span id="co-subtotal-show"></span></div>
+              <div class="summary-row"><span>Giảm giá</span><span id="co-disc-show">0 ₫</span></div>
+              <div class="summary-row total"><span>Thanh toán</span><span id="checkout-final-amount" style="color:var(--primary)">0 ₫</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Payment confirmation -->
+      <div id="co-step-2" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+          <div>
+            <h4 style="margin-bottom:14px;color:var(--gray-700);font-size:14px">📋 Tóm tắt đơn hàng</h4>
+            <div class="summary-box">
+              <div class="summary-row"><span>Mã tham chiếu</span><span id="co-order-ref" style="font-weight:700;font-family:monospace"></span></div>
+              <div class="summary-row total"><span>Tổng thanh toán</span><span id="co-pay-amount" style="color:var(--primary)"></span></div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:var(--warning-light);border-radius:8px;font-size:13px;color:var(--warning)">
+              ⏱ Vui lòng hoàn thành thanh toán trong <strong>15 phút</strong>.<br>
+              Đơn hàng sẽ được xác nhận sau khi nhận được tiền.
+            </div>
+          </div>
+          <div>
+            <!-- QR Section -->
+            <div id="co-qr-section">
+              <div class="qr-box">
+                <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px">Quét mã QR để thanh toán</p>
+                <img id="qr-img" src="" alt="QR Code" style="width:210px;height:210px;border-radius:10px;border:3px solid #fff;box-shadow:var(--shadow-md)">
+                <div class="qr-amount-big" id="qr-amount-text"></div>
+              </div>
+              <div class="bank-info-box">
+                <div class="bank-row"><span class="bk">Ngân hàng</span><span class="bv" id="qr-bank-name"></span></div>
+                <div class="bank-row"><span class="bk">Số tài khoản</span><span class="bv" id="qr-account-no"></span></div>
+                <div class="bank-row"><span class="bk">Chủ tài khoản</span><span class="bv" id="qr-account-name"></span></div>
+                <div class="bank-row"><span class="bk">Nội dung CK</span><span class="bv" id="qr-content" style="color:var(--danger)"></span></div>
+              </div>
+            </div>
+            <!-- Cash Section -->
+            <div id="co-cash-section" style="display:none">
+              <div class="cash-confirm-box">
+                <div class="cash-icon">💵</div>
+                <p>Thanh toán <strong id="co-pay-amount-2"></strong></p>
+                <p style="margin-top:8px;font-weight:400;color:#166534">Nhân viên sẽ nhận tiền mặt khi giao hàng hoặc tại quầy.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('checkout-modal')">Hủy</button>
+      <button class="btn btn-outline" id="co-back-btn" onclick="showCheckoutStep(1)" style="display:none">← Quay lại</button>
+      <button class="btn btn-primary" id="co-next-btn" onclick="goToPaymentStep()">Tiếp theo →</button>
+      <button class="btn btn-success" id="btn-confirm-checkout" onclick="confirmCheckout()" style="display:none">✅ Xác nhận đặt hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CUSTOMER REGISTRATION MODAL ===== -->
+<div class="modal-overlay" id="register-modal">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>
+        <svg style="width:24px;height:24px;vertical-align:middle;margin-right:6px" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="9" fill="url(#logo-grad)"/>
+          <rect x="11" y="5" width="14" height="24" rx="3" fill="white" opacity=".95"/>
+          <rect x="13" y="8" width="10" height="15" rx="2" fill="#1d4ed8"/>
+          <circle cx="18" cy="26" r="1.5" fill="white"/>
+        </svg>
+        Đăng ký khách hàng mới
+      </h3>
+      <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="register-error" id="register-error"></div>
+      <form id="register-form" onsubmit="return false">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Họ và tên <span class="required">*</span></label>
+            <input class="form-control" id="reg-name" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại <span class="required">*</span></label>
+            <input class="form-control" id="reg-phone" placeholder="0901234567" type="tel">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" id="reg-email" placeholder="email@gmail.com">
+          </div>
+          <div class="form-group">
+            <label>Giới tính</label>
+            <select class="form-control" id="reg-gender">
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ngày sinh</label>
+            <input class="form-control" type="date" id="reg-birthday">
+          </div>
+          <div class="form-group">
+            <label>Địa chỉ</label>
+            <input class="form-control" id="reg-address" placeholder="Địa chỉ của bạn">
+          </div>
+        </div>
+        <!-- Password section -->
+        <div style="border-top:1px solid var(--gray-200);margin:4px 0 16px;padding-top:16px">
+          <p style="font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">🔒 Tạo mật khẩu</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mật khẩu <span class="required">*</span></label>
+              <div class="password-wrapper">
+                <input class="form-control" type="password" id="reg-password" placeholder="Tối thiểu 6 ký tự" oninput="checkPwdStrength(this,'reg-pwd-strength')">
+                <button type="button" class="password-toggle" onclick="togglePwd('reg-password',this)">👁</button>
+              </div>
+              <div class="pwd-strength" id="reg-pwd-strength" style="display:none">
+                <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="reg-pwd-fill"></div></div>
+                <span class="pwd-strength-label" id="reg-pwd-label"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Xác nhận mật khẩu <span class="required">*</span></label>
+              <div class="password-wrapper">
+                <input class="form-control" type="password" id="reg-password-confirm" placeholder="Nhập lại mật khẩu" oninput="checkPwdMatch('reg-password','reg-password-confirm','reg-match-msg')">
+                <button type="button" class="password-toggle" onclick="togglePwd('reg-password-confirm',this)">👁</button>
+              </div>
+              <span class="form-hint" id="reg-match-msg"></span>
+            </div>
+          </div>
+        </div>
+      </form>
+      <p style="font-size:12px;color:var(--gray-400);margin-top:4px">Thông tin của bạn sẽ được bảo mật và chỉ dùng để liên hệ khi cần thiết.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('register-modal')">Hủy</button>
+      <button class="btn btn-primary" id="btn-register" onclick="submitRegister()">📝 Đăng ký ngay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PORTAL PRODUCT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="portal-product-detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📱 Chi tiết sản phẩm</h3>
+      <button class="modal-close" onclick="closeModal('portal-product-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="portal-product-detail-content"></div>
+  </div>
+</div>
+
+<!-- ===== CHANGE PASSWORD MODAL ===== -->
+<div class="modal-overlay" id="change-pwd-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>🔑 Đổi mật khẩu</h3>
+      <button class="modal-close" onclick="closeModal('change-pwd-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="register-error" id="change-pwd-error"></div>
+      <div id="change-pwd-success" style="background:var(--success-light);color:#15803d;border:1.5px solid var(--success);border-radius:var(--radius);padding:12px 14px;font-size:13px;font-weight:600;display:none;margin-bottom:12px">
+        ✅ Đổi mật khẩu thành công!
+      </div>
+      <form id="change-pwd-form" onsubmit="return false">
+        <div class="form-group">
+          <label>Số điện thoại đã đăng ký <span class="required">*</span></label>
+          <input class="form-control" id="cpwd-phone" type="tel" placeholder="0901234567">
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu hiện tại <span class="required">*</span></label>
+          <div class="password-wrapper">
+            <input class="form-control" type="password" id="cpwd-old" placeholder="Mật khẩu hiện tại">
+            <button type="button" class="password-toggle" onclick="togglePwd('cpwd-old',this)">👁</button>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--gray-200);margin:4px 0 14px;padding-top:14px"></div>
+        <div class="form-group">
+          <label>Mật khẩu mới <span class="required">*</span></label>
+          <div class="password-wrapper">
+            <input class="form-control" type="password" id="cpwd-new" placeholder="Tối thiểu 6 ký tự" oninput="checkPwdStrength(this,'cpwd-strength')">
+            <button type="button" class="password-toggle" onclick="togglePwd('cpwd-new',this)">👁</button>
+          </div>
+          <div class="pwd-strength" id="cpwd-strength" style="display:none">
+            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="cpwd-fill"></div></div>
+            <span class="pwd-strength-label" id="cpwd-label"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Xác nhận mật khẩu mới <span class="required">*</span></label>
+          <div class="password-wrapper">
+            <input class="form-control" type="password" id="cpwd-confirm" placeholder="Nhập lại mật khẩu mới" oninput="checkPwdMatch('cpwd-new','cpwd-confirm','cpwd-match-msg')">
+            <button type="button" class="password-toggle" onclick="togglePwd('cpwd-confirm',this)">👁</button>
+          </div>
+          <span class="form-hint" id="cpwd-match-msg"></span>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('change-pwd-modal')">Hủy</button>
+      <button class="btn btn-primary" id="btn-change-pwd" onclick="submitChangePassword()">🔑 Đổi mật khẩu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="assets/js/api.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/dashboard.js"></script>
+<script src="assets/js/phones.js"></script>
+<script src="assets/js/pages.js"></script>
+<script>
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  // Login
+  document.getElementById('btn-login').addEventListener('click', doLogin);
+  document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // Check existing session
+  if (Auth.isLoggedIn()) {
+    initApp();
+  } else {
+    showLoginPage();
+  }
+});
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('btn-login');
+  errEl.style.display = 'none';
+  btn.textContent = 'Đang đăng nhập...';
+  btn.disabled = true;
+  try {
+    const res = await POST('/auth/login', { email, password });
+    Auth.setSession(res.token, res.user);
+    initApp();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Đăng nhập →';
+    btn.disabled = false;
+  }
+}
+
+function initApp() {
+  const user = Auth.getUser();
+  if (!user) { showLoginPage(); return; }
+  showApp();
+
+  // Update topbar
+  document.getElementById('topbar-name').textContent = user.name;
+  document.getElementById('topbar-role').textContent = user.role === 'admin' ? '👑 Quản lý' : '👤 Nhân viên';
+  document.getElementById('topbar-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+  // Hide admin-only if not admin
+  if (!Auth.isAdmin()) {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  }
+
+  navigateTo('dashboard');
+}
+
+function logout() {
+  Auth.clear();
+  showLoginPage();
+  toast('Đã đăng xuất', 'warning');
+}
+</script>
+</body>
+</html>
