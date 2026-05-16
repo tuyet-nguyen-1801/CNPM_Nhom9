@@ -196,6 +196,9 @@
 <div id="app" style="display:none">
   <div class="layout">
 
+    <!-- Overlay backdrop khi sidebar mở trên mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
@@ -210,32 +213,32 @@
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section-title">Tổng quan</div>
-        <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+        <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard');closeSidebar()">
           <span class="nav-icon">📊</span> Dashboard
         </div>
 
         <div class="nav-section-title">Quản lý</div>
-        <div class="nav-item" data-page="phones" onclick="navigateTo('phones')">
+        <div class="nav-item" data-page="phones" onclick="navigateTo('phones');closeSidebar()">
           <span class="nav-icon">📱</span> Sản phẩm
         </div>
-        <div class="nav-item" data-page="customers" onclick="navigateTo('customers')">
+        <div class="nav-item" data-page="customers" onclick="navigateTo('customers');closeSidebar()">
           <span class="nav-icon">👥</span> Khách hàng
         </div>
-        <div class="nav-item" data-page="orders" onclick="navigateTo('orders')">
+        <div class="nav-item" data-page="orders" onclick="navigateTo('orders');closeSidebar()">
           <span class="nav-icon">🛒</span> Đơn hàng
         </div>
-        <div class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
+        <div class="nav-item" data-page="invoices" onclick="navigateTo('invoices');closeSidebar()">
           <span class="nav-icon">🧾</span> Hóa đơn
         </div>
-        <div class="nav-item" data-page="inventory" onclick="navigateTo('inventory')">
+        <div class="nav-item" data-page="inventory" onclick="navigateTo('inventory');closeSidebar()">
           <span class="nav-icon">📦</span> Kho hàng
         </div>
 
         <div class="nav-section-title">Báo cáo & Admin</div>
-        <div class="nav-item" data-page="stats" onclick="navigateTo('stats')">
+        <div class="nav-item" data-page="stats" onclick="navigateTo('stats');closeSidebar()">
           <span class="nav-icon">📈</span> Báo cáo
         </div>
-        <div class="nav-item admin-only" data-page="users" onclick="navigateTo('users')">
+        <div class="nav-item admin-only" data-page="users" onclick="navigateTo('users');closeSidebar()">
           <span class="nav-icon">👤</span> Nhân viên
         </div>
       </nav>
@@ -250,6 +253,10 @@
     <main class="main">
       <!-- TOPBAR -->
       <div class="topbar">
+        <!-- Nút hamburger: chỉ hiển thị trên mobile -->
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Mở menu">
+          <span></span><span></span><span></span>
+        </button>
         <div class="topbar-title" id="topbar-title">📊 Tổng quan</div>
         <!-- Cart Button -->
         <button class="cart-topbar-btn" onclick="openCart()" title="Giỏ hàng">

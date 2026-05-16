@@ -398,15 +398,64 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   font-size: 16px; font-weight: 700; color: var(--gray-800);
 }
 
+/* ===== HAMBURGER BUTTON ===== */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  background: none;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 6px;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.hamburger-btn:hover { background: var(--gray-100); }
+.hamburger-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--gray-700);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+/* Biến thành dấu X khi sidebar mở */
+.hamburger-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ===== SIDEBAR OVERLAY (backdrop) ===== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.show { display: block; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
+  .hamburger-btn { display: flex; }
+  .sidebar { transform: translateX(-100%); box-shadow: none; }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,.25);
+  }
   .main { margin-left: 0; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .page-content { padding: 16px; }
+  .topbar { padding: 0 16px; gap: 10px; }
+  .topbar-title { font-size: 15px; }
+  .cart-btn-label { display: none; }
 }
 
 /* ===== PRINT INVOICE ===== */

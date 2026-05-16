@@ -167,6 +167,22 @@ function navigateTo(page) {
   if (window[`load_${page}`]) window[`load_${page}`]();
 }
 
+/* ── Hamburger / Sidebar Mobile ─────────────────────────────────────────────── */
+function toggleSidebar() {
+  const isOpen = document.getElementById('sidebar').classList.contains('open');
+  isOpen ? closeSidebar() : openSidebar();
+}
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('show');
+  document.getElementById('hamburger-btn').classList.add('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('show');
+  document.getElementById('hamburger-btn')?.classList.remove('active');
+}
+
 /* ── Phân trang tái sử dụng ──────────────────────────────────────────────────── */
 function renderPagination(containerId, total, page, limit, onPage) {
   const totalPages = Math.ceil(total / limit);

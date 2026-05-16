@@ -152,6 +152,8 @@ phone-store/
 | `frontend/index.html` | Toàn bộ cấu trúc HTML: trang đăng nhập, sidebar, 8 trang quản lý, portal khách hàng, tất cả modal |
 | `frontend/assets/js/api.js` | API wrapper, Auth module, toast notifications, định dạng tiền/ngày, modal helper, phân trang |
 | `frontend/assets/js/cart.js` | Giỏ hàng (slide-out), thanh toán QR VietQR, đăng ký/login khách hàng, toàn bộ portal mua sắm |
+| `frontend/assets/css/style.css` | **Đồng phát triển** responsive mobile: thêm hamburger menu, sidebar ẩn/hiện trên màn hình nhỏ |
+
 
 ---
 
