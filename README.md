@@ -153,7 +153,7 @@ phone-store/
 | `frontend/assets/js/api.js` | API wrapper, Auth module, toast notifications, định dạng tiền/ngày, modal helper, phân trang |
 | `frontend/assets/js/cart.js` | Giỏ hàng (slide-out), thanh toán QR VietQR, đăng ký/login khách hàng, toàn bộ portal mua sắm |
 | `frontend/assets/css/style.css` | **Đồng phát triển** responsive mobile: thêm hamburger menu, sidebar ẩn/hiện trên màn hình nhỏ |
-
+| `frontend/assets/js/chatbot.js` | **PhoneBot** — chatbot AI phân quyền 3 vai trò (khách hàng / nhân viên / admin), hỏi đáp sản phẩm, đơn hàng, kho và thống kê doanh thu |
 
 ---
 
@@ -212,6 +212,26 @@ phone-store/
 | `backend/controllers/phoneController.js` | CRUD sản phẩm điện thoại, tự động tạo bản ghi kho khi thêm sản phẩm mới |
 | `frontend/assets/js/dashboard.js` | Trang tổng quan, biểu đồ cột doanh thu 6 tháng (vẽ bằng HTML/CSS thuần, không cần thư viện) |
 | `backend/package.json` | Cấu hình dự án Node.js, khai báo các thư viện phụ thuộc |
+
+---
+
+## 🤖 PhoneBot — Trợ lý AI
+
+> Phát triển bởi **Nguyễn Thị Tuyết** (Trưởng nhóm)
+
+PhoneBot là chatbot tích hợp ngay trong giao diện, hiện ra sau khi đăng nhập. Hỗ trợ 3 nhóm vai trò với câu hỏi khác nhau:
+
+| Vai trò | Câu hỏi có thể hỏi |
+|---|---|
+| **Khách hàng** | Tất cả sản phẩm, flagship, tầm trung, giá rẻ, còn hàng, đơn hàng của tôi |
+| **Nhân viên** | Tồn kho đầy đủ, sắp hết / hết hàng, đơn chờ xác nhận, đơn đang giao, danh sách khách hàng |
+| **Admin** | Tất cả của nhân viên + thống kê tháng, doanh thu hôm nay, top sản phẩm bán chạy |
+
+**Điểm kỹ thuật:**
+- Hiện **toàn bộ dữ liệu** — không cắt bớt bằng "..."
+- Sản phẩm nhóm theo hãng cho dễ đọc
+- Nhận dạng tiếng Việt có / không dấu (`_n()` normalizer)
+- Hiển thị widget nổi góc phải, spring animation
 
 ---
 

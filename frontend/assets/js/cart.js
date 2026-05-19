@@ -540,7 +540,8 @@ function showCustomerPortal(user) {
   document.getElementById('pp-address').value = user.address || '';
 
   cartUpdateBadge();
-  loadPortalProducts(); // Tải sản phẩm ngay khi vào portal
+  loadPortalProducts();
+  if (typeof chatbotShow === 'function') chatbotShow();
 }
 
 /* ================================================
@@ -726,6 +727,7 @@ async function loadPortalOrders() {
 function customerLogout() {
   localStorage.removeItem('customer_token');
   localStorage.removeItem('customer_user');
+  if (typeof chatbotHide === 'function') chatbotHide();
   document.getElementById('customer-portal').style.display = 'none';
   document.getElementById('login-page').style.display      = 'flex';
   switchLoginTab('customer');

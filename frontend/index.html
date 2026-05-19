@@ -56,7 +56,7 @@
 
     <!-- Login Tabs -->
     <div class="login-tabs">
-      <button class="login-tab active" id="tab-staff" onclick="switchLoginTab('staff')">👤 Nhân viên</button>
+      <button class="login-tab active" id="tab-staff" onclick="switchLoginTab('staff')">👤 Nhân viên / Quản lý</button>
       <button class="login-tab" id="tab-customer" onclick="switchLoginTab('customer')">🛒 Khách hàng</button>
     </div>
 
@@ -1123,12 +1123,40 @@
   </div>
 </div>
 
+<!-- ===== CHATBOT ===== -->
+<button class="chatbot-toggle" id="chatbot-toggle" onclick="toggleChatbot()" title="PhoneBot — Trợ lý thông minh">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <span class="chatbot-badge" id="chatbot-unread"></span>
+</button>
+<div class="chatbot-window" id="chatbot-window">
+  <div class="chatbot-header">
+    <div class="chatbot-hav">🤖</div>
+    <div class="chatbot-hinfo">
+      <strong>PhoneBot</strong>
+      <span>🟢 Trực tuyến</span>
+    </div>
+    <button class="chatbot-hclose" onclick="toggleChatbot()">✕</button>
+  </div>
+  <div class="chatbot-msgs" id="chatbot-msgs"></div>
+  <div class="chatbot-input-area">
+    <input type="text" id="chatbot-input" placeholder="Hỏi PhoneBot...">
+    <button class="chatbot-send-btn" onclick="chatbotSend()" title="Gửi">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
 <!-- ==================== SCRIPTS ==================== -->
 <script src="assets/js/api.js"></script>
 <script src="assets/js/cart.js"></script>
 <script src="assets/js/dashboard.js"></script>
 <script src="assets/js/phones.js"></script>
 <script src="assets/js/pages.js"></script>
+<script src="assets/js/chatbot.js"></script>
 <script>
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1181,10 +1209,12 @@ function initApp() {
   }
 
   navigateTo('dashboard');
+  chatbotShow();
 }
 
 function logout() {
   Auth.clear();
+  chatbotHide();
   showLoginPage();
   toast('Đã đăng xuất', 'warning');
 }
