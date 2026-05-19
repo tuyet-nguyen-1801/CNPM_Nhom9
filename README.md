@@ -129,11 +129,11 @@ phone-store/
 ## 👥 Phân công công việc
 
 > **Tổng số thành viên: 4 người**
-> Tuyết đảm nhận phần nhiều hơn với vai trò Trưởng nhóm (~40%), ba thành viên còn lại chia đều (~20% mỗi người).
+> Tuyết đảm nhận phần nhiều hơn với vai trò Trưởng nhóm (~50%), ba thành viên còn lại chia đều (~20% mỗi người).
 
 ---
 
-### 👑 Nguyễn Thị Tuyết — Trưởng nhóm (~40%)
+### 👑 Nguyễn Thị Tuyết — Trưởng nhóm (~50%)
 
 **Backend — Lõi hệ thống:**
 
