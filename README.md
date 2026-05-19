@@ -144,6 +144,9 @@ phone-store/
 | `backend/middlewares/auth.js` | JWT middleware: protect, adminOnly, customerOnly |
 | `backend/controllers/authController.js` | Đăng nhập nhân viên, xem profile, đổi mật khẩu |
 | `backend/controllers/orderController.js` | Tạo đơn hàng (DB transaction: kiểm tra kho → tạo đơn → trừ tồn kho → ghi lịch sử) |
+| `backend/routes/inventory.js` | Route API kho hàng |
+| `backend/routes/invoices.js` | Route API hóa đơn |
+| `backend/routes/stats.js` | Route API thống kê |
 
 **Frontend — Giao diện và tương tác:**
 
@@ -170,9 +173,7 @@ phone-store/
 | `backend/routes/users.js` | Route quản lý nhân viên (Admin only) |
 | `backend/routes/phones.js` | Route API sản phẩm điện thoại |
 | `backend/routes/orders.js` | Route API đơn hàng |
-| `backend/routes/inventory.js` | Route API kho hàng |
-| `backend/routes/invoices.js` | Route API hóa đơn |
-| `backend/routes/stats.js` | Route API thống kê |
+
 
 **Frontend:**
 
