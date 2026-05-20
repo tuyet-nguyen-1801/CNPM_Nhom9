@@ -156,7 +156,7 @@ phone-store/
 | `frontend/assets/js/api.js` | API wrapper, Auth module, toast notifications, định dạng tiền/ngày, modal helper, phân trang |
 | `frontend/assets/js/cart.js` | Giỏ hàng (slide-out), thanh toán QR VietQR, đăng ký/login khách hàng, toàn bộ portal mua sắm |
 | `frontend/assets/css/style.css` | **Đồng phát triển** responsive mobile: thêm hamburger menu, sidebar ẩn/hiện trên màn hình nhỏ |
-| `frontend/assets/js/chatbot.js` | **PhoneBot** — chatbot AI phân quyền 3 vai trò (khách hàng / nhân viên / admin), hỏi đáp sản phẩm, đơn hàng, kho và thống kê doanh thu |
+| `frontend/assets/js/chatbot.js` | **PhoneBot** — chatbot AI phân quyền 3 vai trò (khách hàng / nhân viên / admin), hỏi đáp các câu hỏi|
 
 ---
 
@@ -208,7 +208,7 @@ phone-store/
 
 | File | Nội dung |
 |---|---|
-| `Phone.sql` | Thiết kế toàn bộ schema CSDL (8 bảng: users, customers, phones, inventory, orders, order_items, invoices, invoice_items, inventory_transactions), dữ liệu mẫu |
+| `Phone.sql` | Thiết kế toàn bộ schema CSDL (8 bảng: users, customers, phones, inventory, orders, order_items, invoices, invoice_items, inventory_transactions),60 dữ liệu mẫu |
 | `fix_admin_and_passwords.sql` | Script cập nhật tên admin và reset mật khẩu nhân viên khi cần |
 | `backend/controllers/phoneController.js` | CRUD sản phẩm điện thoại, tự động tạo bản ghi kho khi thêm sản phẩm mới |
 | `frontend/assets/js/dashboard.js` | Trang tổng quan, biểu đồ cột doanh thu 6 tháng (vẽ bằng HTML/CSS thuần, không cần thư viện) |
@@ -224,9 +224,10 @@ PhoneBot là chatbot tích hợp ngay trong giao diện, hiện ra sau khi đăn
 
 | Vai trò | Câu hỏi có thể hỏi |
 |---|---|
-| **Khách hàng** | Tất cả sản phẩm, flagship, tầm trung, giá rẻ, còn hàng, đơn hàng của tôi |
-| **Nhân viên** | Tồn kho đầy đủ, sắp hết / hết hàng, đơn chờ xác nhận, đơn đang giao, danh sách khách hàng |
-| **Admin** | Tất cả của nhân viên + thống kê tháng, doanh thu hôm nay, top sản phẩm bán chạy |
+| **Khách hàng** | Tất cả sản phẩm, flagship, tầm trung, giá rẻ, còn hàng, đơn hàng của tôi, Sản phẩm còn hàng,Tất cả sản phẩm,Tư vấn chọn máy, Pin lâu nhất, máy chụp đ, đơn hàng của tôi, chính sách, thông tin giao hàng   |
+| **Nhân viên** | Tồn kho đầy đủ, sắp hết / hết hàng, đơn chờ xác nhận, đơn đang giao, danh sách khách hàng, tất cả sản phẩm, đơn hoàn thành, khách hàng, pin lâu nhất |
+| **Admin** | Tất cả của nhân viên + thống kê tháng, doanh thu hôm nay, top sản phẩm bán chạy, khách hàng|
+
 
 **Điểm kỹ thuật:**
 - Hiện **toàn bộ dữ liệu** — không cắt bớt bằng "..."
